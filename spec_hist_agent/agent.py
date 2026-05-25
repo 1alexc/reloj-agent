@@ -1,38 +1,45 @@
 from google.adk.agents.llm_agent import Agent
-# Placeholder import for a vector database RAG tool. Replace with the actual ADK tool when available.
-# from google.adk.tools import vector_search
+from google.adk.tools import google_search
 
 """
 Spec Historian Agent
-====================
+===================
 
 Purpose
 -------
-Provides precise technical specifications, heritage information, and caliber details for watches. The agent must never guess; if the requested information is not found in the knowledge base it should respond clearly that it cannot answer.
+Provides precise technical specifications, heritage information, and caliber details
+for watches. The agent must never guess; if the requested information cannot be
+found via web search it should respond clearly that it cannot answer.
 
 Tools
 -----
-* **vector_search** – a RAG‑style retrieval over a curated vector store containing official manufacturer catalogs, Wikipedia extracts and other horology datasets. The tool returns a list of relevant passages that the LLM can cite.
+* **google_search** – Uses Google Search to retrieve recent, reputable web pages
+  (official brand sites, Wikipedia, horology references). The tool returns a list of
+  snippets that the LLM can cite.
 
 Behavior
 --------
-1. Query the vector store with the user’s watch model.
-2. If at least one passage is returned, extract the exact technical data (caliber name, beat rate, water resistance, power reserve, etc.).
-3. Respond with a concise, fact‑only answer, e.g.:
-   `Caliber MT5402, 28,800 vph, 70 m water resistance, 70 h power reserve.`
-4. If no passage is found, reply with a fallback like:
-   “I’m sorry, I don’t have verified data for that model.”
+1. Query `google_search` with a concise query that includes the watch brand,
+   model, and the phrase “specifications” or “history”.
+2. Scan the returned snippets for concrete data (caliber name, beat rate,
+   water resistance, power reserve, introduction year, notable milestones).
+3. Return a concise, fact‑only answer, e.g.:
+
+   `Caliber MT5402, 28,800 vph, 70 m water resistance, 70 h power reserve; introduced 2018.`
+
+4. If no reliable snippet is found, reply with a polite fallback such as:
+   “I’m sorry, I couldn’t locate verified specifications for that model.”
 """
 
 spec_hist_agent = Agent(
     model='gemini-2.5-flash',
     name='spec_hist_agent',
-    description='Provides exact watch technical specs and heritage facts without speculation.',
+    description='Provides exact watch technical specs and heritage facts using web search.',
     instruction=(
-        "When a user asks for specifications, query the vector_search tool with the watch model. "
-        "Only return data that appears in the retrieved passages; never fabricate values. "
-        "If nothing is found, politely inform the user that the information is unavailable."
+        "When a user asks for watch specifications or history, use the google_search tool "
+        "with a focused query (brand, model, and 'specifications'). Only return data "
+        "that appears in the retrieved snippets; never fabricate values. If nothing reliable "
+        "is found, inform the user that the information is unavailable."
     ),
-    # Uncomment when the vector search tool is available:
-    # tools=[vector_search],
+    tools=[google_search],
 )
