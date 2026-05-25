@@ -1,7 +1,5 @@
 from google.adk.agents.llm_agent import Agent
-from spec_hist_agent.agent import spec_hist_agent
-from market_agent.agent import market_agent
-from style_agent.agent import style_agent
+
 
 """
 Root Orchestrator Agent
@@ -23,7 +21,7 @@ If it concerns price, availability, or market trends, delegate to market_agent.
 If it concerns styling, wrist size, outfit matching, or occasion, delegate to style_agent.
 Aggregate the response from the specialist and present it clearly to the user, maintaining conversation context.
 If the user asks a general, non-watch question, respond directly yourself.''',
-    sub_agents=[spec_hist_agent, market_agent, style_agent],
+
 )
 
 
